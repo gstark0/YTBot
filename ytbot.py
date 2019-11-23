@@ -8,7 +8,6 @@ import time
 import os
 
 
-binary = '/Applications/Tor Browser.app/Contents/MacOS/firefox'
 ua = UserAgent()
 
 class WebBrowser():

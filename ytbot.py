@@ -42,8 +42,8 @@ if __name__ == '__main__':
     args = ArgumentParser()
     args.add_argument('--tor', help='Whether to use tor proxy', action='store_true')
     args.add_argument('--url', help='URL to a YouTube video', required=True)
-    args.add_argument('--delay', help='Whether to use tor proxy', default=10)
-    args.add_argument('--windows', help='Whether to use tor proxy', default=10)
+    args.add_argument('--delay', help='Time to wait before the browser is closed, counts after the page loads', default=10)
+    args.add_argument('--windows', help='How many windows are opened at once', default=2)
 
     args = args.parse_args()
     

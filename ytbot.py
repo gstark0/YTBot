@@ -12,13 +12,18 @@ ua = UserAgent()
 
 class WebBrowser():
     def __init__(self, use_tor):
-        with Controller.from_port(port = 9151) as controller:
-            controller.authenticate()
-            controller.signal(Signal.NEWNYM)
-
+        
+        # Generate random user agent
         self.chrome_options = Options()
         self.chrome_options.add_argument(f'user-agent={ua.random}')
+
         if use_tor:
+            # Change TOR node
+            with Controller.from_port(port = 9151) as controller:
+                controller.authenticate()
+                controller.signal(Signal.NEWNYM)
+            
+            # Use TOR proxy server (TOR must be running)
             self.chrome_options.add_argument('--proxy-server=socks5://127.0.0.1:9150')
         else:
             self.chrome_options.add_argument('--proxy-server=socks5://127.0.0.1:9150')
@@ -26,6 +31,8 @@ class WebBrowser():
     def open(self, url):
         self.driver = webdriver.Chrome(executable_path='./chromedriver', options=self.chrome_options)
         self.driver.get(url)
+
+        # Just in case if youtube video didn't load properly
         try:
             player = self.driver.find_element_by_id('player')
             player.click()
@@ -48,13 +55,17 @@ if __name__ == '__main__':
     args = args.parse_args()
     
     use_tor = args.tor
+    # Do some calculations to get expected views using specified number of windows opened at once
     for i in range(int(args.views / args.windows)):
+
+        # Open all the browsers and load youtube videos
         browsers = []
         for j in range(args.windows):
             browsers.append(WebBrowser(use_tor))
             browsers[j].open(args.url)
-
+        
         time.sleep(args.delay)
 
+        # Close all the browsers
         for b in browsers:
             b.close()

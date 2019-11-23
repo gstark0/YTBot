@@ -3,6 +3,7 @@ from selenium import webdriver
 from stem import Signal
 from stem.control import Controller
 from fake_useragent import UserAgent
+from  multiprocessing import Process
 from argparse import ArgumentParser
 import random
 import time
@@ -14,7 +15,7 @@ proxy_file = 'proxy.txt'
 
 class WebBrowser():
     def __init__(self, use_tor):
-        
+
         # Generate random user agent
         self.chrome_options = Options()
         self.chrome_options.add_argument(f'user-agent={ua.random}')
@@ -35,7 +36,7 @@ class WebBrowser():
             self.proxy_ip, self.proxy_port = proxy.split(':')
             self.chrome_options.add_argument('--proxy-server=socks5://%s:%s' % (self.proxy_ip, self.proxy_port))
     
-    def open(self, url):
+    def open(self, url, delay):
         self.driver = webdriver.Chrome(executable_path='./chromedriver', options=self.chrome_options)
         self.driver.get(url)
 
@@ -47,8 +48,9 @@ class WebBrowser():
             player.click()
         except:
             pass
-
-    def close(self):
+        
+        # Close the window after specified time
+        time.sleep(delay)
         self.driver.close()
 
 
@@ -63,17 +65,29 @@ if __name__ == '__main__':
     args = args.parse_args()
     
     use_tor = args.tor
+
+    b1 = WebBrowser(use_tor)
+    b2 = WebBrowser(use_tor)
+
+    p = Process(target=b1.open, args=(args.url, args.delay))
+    p2 = Process(target=b2.open, args=(args.url, args.delay))
+
+    p.start()
+    p2.start()
+
+    p.join()
+    p2.join()
+
     # Do some calculations to get expected views using specified number of windows opened at once
     for i in range(int(args.views / args.windows)):
 
         # Open all the browsers and load youtube videos
-        browsers = []
+        processes = []
         for j in range(args.windows):
-            browsers.append(WebBrowser(use_tor))
-            browsers[j].open(args.url)
+            b = WebBrowser(use_tor)
+            p = Process(target=b.open, args=(args.url, args.delay))
+            processes.append(p)
+            processes[j].start()
 
-        time.sleep(args.delay)
-
-        # Close all the browsers
-        for b in browsers:
-            b.close()
+        for p in processes:
+            p.join()

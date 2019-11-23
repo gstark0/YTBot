@@ -4,11 +4,13 @@ from stem import Signal
 from stem.control import Controller
 from fake_useragent import UserAgent
 from argparse import ArgumentParser
+import random
 import time
 import os
 
 
 ua = UserAgent()
+proxy_file = 'proxy.txt'
 
 class WebBrowser():
     def __init__(self, use_tor):
@@ -26,7 +28,12 @@ class WebBrowser():
             # Use TOR proxy server (TOR must be running)
             self.chrome_options.add_argument('--proxy-server=socks5://127.0.0.1:9150')
         else:
-            self.chrome_options.add_argument('--proxy-server=socks5://127.0.0.1:9150')
+            # Get and use random proxy from file
+            with open(proxy_file, 'r') as f:
+                proxy_list = f.readlines()
+            proxy = random.choice(proxy_list).strip()
+            self.proxy_ip, self.proxy_port = proxy.split(':')
+            self.chrome_options.add_argument('--proxy-server=socks5://%s:%s' % (self.proxy_ip, self.proxy_port))
     
     def open(self, url):
         self.driver = webdriver.Chrome(executable_path='./chromedriver', options=self.chrome_options)

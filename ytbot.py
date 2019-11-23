@@ -42,19 +42,20 @@ if __name__ == '__main__':
     args = ArgumentParser()
     args.add_argument('--tor', help='Whether to use tor proxy', action='store_true')
     args.add_argument('--url', help='URL to a YouTube video', required=True)
-    args.add_argument('--delay', help='Time to wait before the browser is closed, counts after the page loads', default=10)
-    args.add_argument('--windows', help='How many windows are opened at once', default=2)
+    args.add_argument('--views', help='How many views for a video', default=50, type=int)
+    args.add_argument('--delay', help='Time to wait before the browser is closed, starts counting after all windows are loaded', default=10, type=int)
+    args.add_argument('--windows', help='How many windows are opened at once', default=2, type=int)
 
     args = args.parse_args()
     
     use_tor = args.tor
-    while(True):
-        b1 = WebBrowser(use_tor)
-        b2 = WebBrowser(use_tor)
-        
-        b1.open(args.url)
-        b2.open(args.url)
+    for i in range(int(args.views / args.windows)):
+        browsers = []
+        for j in range(args.windows):
+            browsers.append(WebBrowser(use_tor))
+            browsers[j].open(args.url)
 
-        time.sleep(int(args.delay))
-        b1.close()
-        b2.close()
+        time.sleep(args.delay)
+
+        for b in browsers:
+            b.close()

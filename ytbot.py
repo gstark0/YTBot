@@ -32,7 +32,8 @@ class WebBrowser():
         self.driver = webdriver.Chrome(executable_path='./chromedriver', options=self.chrome_options)
         self.driver.get(url)
 
-        # Just in case if youtube video didn't load properly
+        # Sometimes video doesn't load itself so click on it twice
+        # Catch exceptions just in case youtube video didn't load properly
         try:
             player = self.driver.find_element_by_id('player')
             player.click()
@@ -63,7 +64,7 @@ if __name__ == '__main__':
         for j in range(args.windows):
             browsers.append(WebBrowser(use_tor))
             browsers[j].open(args.url)
-        
+
         time.sleep(args.delay)
 
         # Close all the browsers

@@ -40,10 +40,12 @@ class WebBrowser():
         self.driver = webdriver.Chrome(executable_path='./chromedriver', options=self.chrome_options)
         self.driver.get(url)
 
-        # Sometimes video doesn't load itself so click on it twice
+        # Sometimes video doesn't load itself so click on it
         # Catch exceptions just in case youtube video didn't load properly
+        time.sleep(2)
         try:
             player = self.driver.find_element_by_id('player')
+            player.click()
             player.click()
             player.click()
         except:
@@ -66,20 +68,9 @@ if __name__ == '__main__':
     
     use_tor = args.tor
 
-    b1 = WebBrowser(use_tor)
-    b2 = WebBrowser(use_tor)
-
-    p = Process(target=b1.open, args=(args.url, args.delay))
-    p2 = Process(target=b2.open, args=(args.url, args.delay))
-
-    p.start()
-    p2.start()
-
-    p.join()
-    p2.join()
-
     # Do some calculations to get expected views using specified number of windows opened at once
     for i in range(int(args.views / args.windows)):
+        print('Views %s' % ((i+1) * args.windows))
 
         # Open all the browsers and load youtube videos
         processes = []
@@ -91,3 +82,4 @@ if __name__ == '__main__':
 
         for p in processes:
             p.join()
+

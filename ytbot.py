@@ -7,6 +7,7 @@ from  multiprocessing import Process
 from argparse import ArgumentParser
 import random
 import time
+import sys
 import os
 
 
@@ -66,6 +67,10 @@ if __name__ == '__main__':
 
     args = args.parse_args()
     
+    if not args.url.startswith('https://'):
+        print('URL must start with https://')
+        sys.exit()
+
     use_tor = args.tor
 
     # Do some calculations to get expected views using specified number of windows opened at once

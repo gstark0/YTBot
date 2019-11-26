@@ -19,7 +19,7 @@ class WebBrowser():
 
         # Generate random user agent
         self.chrome_options = Options()
-        self.chrome_options.add_argument(f'user-agent={ua.random}')
+        self.chrome_options.add_argument('user-agent=%s' % ua.random)
 
         if use_tor:
             # Change TOR node
@@ -35,7 +35,7 @@ class WebBrowser():
                 proxy_list = f.readlines()
             proxy = random.choice(proxy_list).strip()
             self.proxy_ip, self.proxy_port = proxy.split(':')
-            self.chrome_options.add_argument('--proxy-server=socks5://%s:%s' % (self.proxy_ip, self.proxy_port))
+            self.chrome_options.add_argument('--proxy-server=socks5://%s' % (self.proxy_ip, self.proxy_port))
     
     def open(self, url, delay):
         self.driver = webdriver.Chrome(executable_path='./chromedriver', options=self.chrome_options)
